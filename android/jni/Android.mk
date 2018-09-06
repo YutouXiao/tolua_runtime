@@ -19,6 +19,7 @@ LOCAL_SRC_FILES :=	../../tolua.c \
 					../../pb.c \
 					../../lpeg.c \
 					../../struct.c \
+					../../perflib.c \
 					../../cjson/strbuf.c \
 					../../cjson/lua_cjson.c \
 					../../cjson/fpconv.c \
@@ -39,8 +40,7 @@ LOCAL_SRC_FILES :=	../../tolua.c \
  					../../luasocket/tcp.c \
  					../../luasocket/timeout.c \
  					../../luasocket/udp.c \
- 					../../luasocket/usocket.c \
-					../../luasocket/snapshot.c \
+ 					../../luasocket/usocket.c \					
  					
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit
 include $(BUILD_SHARED_LIBRARY)
