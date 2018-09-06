@@ -49,6 +49,9 @@ static int gettag = 0;
 static int settag = 0;
 static int vptr = 1;
 
+static int hook_index = -1;
+static const char *const hooknames[] = {"call", "return", "line", "count", "tail return"};
+
 /*---------------------------tolua extend functions--------------------------------*/
 LUALIB_API void* tolua_tag()
 {
@@ -1815,6 +1818,43 @@ static int traceback(lua_State *L)
     return 1;
 }
 
+static void hook(lua_State *L, lua_Debug *ar)
+{
+	int event;
+	
+	lua_pushlightuserdata(L, &hook_index);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+
+	event = ar->event;
+	lua_pushstring(L, hooknames[event]);
+  
+	lua_getinfo(L, "nS", ar);
+	if (*(ar->what) == 'C') {
+		lua_pushfstring(L, "[?%s]", ar->name);
+	} else {
+		lua_pushfstring(L, "%s:%d", ar->short_src, ar->linedefined > 0 ? ar->linedefined : 0);
+	}
+
+	lua_call(L, 2, 0);
+}
+
+static int profiler_set_hook(lua_State *L) {
+	if (lua_isnoneornil(L, 1)) {
+		lua_pushlightuserdata(L, &hook_index);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+			
+		lua_sethook(L, 0, 0, 0);
+	} else {
+		luaL_checktype(L, 1, LUA_TFUNCTION);
+		lua_pushlightuserdata(L, &hook_index);
+		lua_pushvalue(L, 1);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		lua_sethook(L, hook, LUA_MASKCALL | LUA_MASKRET, 0);
+	}
+	return 0;
+}
+
 LUALIB_API int tolua_beginpcall(lua_State *L, int reference)
 {	
     lua_getref(L, LUA_RIDX_CUSTOMTRACEBACK);
@@ -2184,6 +2224,7 @@ static const struct luaL_Reg tolua_funcs[] =
     { "int64", tolua_newint64},        
     { "uint64", tolua_newuint64},
     { "traceback", traceback},
+	{ "sethook", profiler_set_hook},
 	{ NULL, NULL }
 };
 

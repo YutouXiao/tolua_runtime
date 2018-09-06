@@ -22,6 +22,11 @@ LOCAL_SRC_FILES :=	../../tolua.c \
 					../../cjson/strbuf.c \
 					../../cjson/lua_cjson.c \
 					../../cjson/fpconv.c \
+					../../luaprofiler/clocks.c \
+					../../luaprofiler/core_profiler.c \
+					../../luaprofiler/function_meter.c \
+					../../luaprofiler/stack.c \
+					../../luaprofiler/lua50_profiler.c \
 					../../luasocket/auxiliar.c \
  					../../luasocket/buffer.c \
  					../../luasocket/except.c \
